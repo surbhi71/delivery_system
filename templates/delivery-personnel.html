@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Personnel Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/delivery-personnel.css') }}">>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Delivery Personnel Dashboard</h1>
+        <a href="/" id = "logout">Logout</a><br>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                    <th>Customer Name</th>
+                    <th>Pickup Address</th>
+                    <th>Drop Address</th>
+                    <th>Customer Email</th>
+                    <th>Customer Contact No</th>
+                    <th>Amount</th>
+                    <th>Weight</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+        <p>For More Orders <a href="/more_orders" onclick="toggleForm('#')">click here!</a></p>
+        <button id="pickup">Pickup</button>
+        <button id="deliver">Deliver</button>
+        <div id="selectedOrder"></div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector("table tbody");
+        const pickup = document.getElementById("pickup");
+        const deliver = document.getElementById("deliver");
+        const selectedOrder = document.getElementById("selectedOrder");
+
+        let selectedOrderId = null;
+        function selectRow(row) {
+        if (selectedOrderId) {
+            const prevSelectedRow = document.querySelector(`[data-order-id="${selectedOrderId}"]`);
+            prevSelectedRow.classList.remove("selected");
+        }
+
+        selectedOrderId = row.cells[0].textContent
+        row.classList.add("selected");
+    }
+
+        // const more = document.getElementById('more');
+        // const htmlContentElement = document.getElementById('htmlContent');
+        async function fetchData() {
+        try {
+            const response = await fetch("/orders_del"); // Replace with your API endpoint
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+
+            // Clear existing rows
+            tableBody.innerHTML = "";
+
+            // Populate the table with fetched data
+            data.forEach((order) => {
+                const row = document.createElement("tr");
+                row.setAttribute("data-order-id", order.id);
+
+                const columns = ["order_id", "status", "customer_name", "pickup_address", "drop_address", "customer_email", "customer_contact_no", "amount", "weight", "quantity"];
+                columns.forEach((column) => {
+                    const cell = document.createElement("td");
+                    cell.textContent = order[column];
+                    row.appendChild(cell);
+                });
+
+                row.addEventListener("click", () => {
+                    selectRow(row);
+                });
+
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    // Initial data fetch
+    fetchData();
+
+    const button = document.getElementById('pickup');
+
+
+    pickup.addEventListener("click", function () {
+        if (selectedOrderId) {
+            selectedOrder.textContent = `${selectedOrderId} order is picked up!`;
+
+            const param1Value = selectedOrderId;
+                console.log(selectedOrderId)
+    
+            const apiUrl = '/change_status_pickup';
+                const queryParams = {
+                    product_id: param1Value
+            };
+            const queryString = Object.keys(queryParams)
+                .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(queryParams[key]))
+                .join('&');
+
+                const completeUrl = apiUrl + '?' + queryString;
+                fetch(completeUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+     }
+        else {
+            selectedOrder.textContent = "No order selected.";
+        }
+
+         } );
+
+         deliver.addEventListener("click", function () {
+        if (selectedOrderId) {
+            selectedOrder.textContent = `${selectedOrderId} order is delivered!`;
+
+            const param1Value = selectedOrderId;
+                console.log(selectedOrderId)
+
+            const apiUrl = '/change_status_delivered';
+                const queryParams = {
+                    product_id: param1Value
+            };
+            const queryString = Object.keys(queryParams)
+                .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(queryParams[key]))
+                .join('&');
+
+                const completeUrl = apiUrl + '?' + queryString;
+                fetch(completeUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+     }
+        else {
+            selectedOrder.textContent = "No order selected.";
+        }
+
+         } );
+
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!-- past_orders.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Orders</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/past_orders.css') }}">
+
+</head>
+<body>
+    <div class="container">
+        <h1>Past Orders</h1>
+        <a href="/" id = "logout">Logout</a><br>
+
+        <table id="orderTable">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Delivery Personnel Name</th>
+                    <th>Delivery Personnel Email ID</th>
+                    <th>Delivery Personnel Contact Number</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const orderTable = document.getElementById("orderTable");
+
+    async function fetchPastOrders() {
+        try {
+            const response = await fetch("/past");
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+
+           
+            const tbody = orderTable.querySelector("tbody");
+            data.forEach((customer) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${customer.order_id}</td>
+                    <td>${customer.date}</td>
+                    <td>${customer.status}</td>
+                    <td>${customer.delivery_personnel_full_name}</td>
+                    <td>${customer.delivery_personnel_email}</td>
+                    <td>${customer.delivery_personnel_contact_number}</td>
+
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error fetching past orders:", error);
+        }
+    }
+
+    
+    fetchPastOrders();
+});
+
+</script>
+</body>
+</html>

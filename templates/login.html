@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div id="login-form">
+            <h2>Login</h2>
+            <form method="POST" action="/login">
+                <label for="user-type-login"><b>User Type</b></label>
+                <select name="user-type-login" id="user-type-login">
+                    <option>--SELECT--</option>
+                    <option value="customer">Customer</option>
+                    <option value="delivery_personnel">Delivery Personnel</option>
+                </select>
+
+                <label for="username"><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="username" required>
+
+                <label for="password"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="toggleForm('signup-form')">Sign Up</a></p>
+        </div>
+        <div id="signup-form" style="display: none;">
+            <h2>Sign Up</h2>
+            <form method="POST" action="/signup">
+                <label for="user-type-signup"><b>User Type</b></label>
+                <select name="user-type-signup" id="user-type-signup">
+                    <option value="select">--SELECT--</option>
+                    <option value="customer">Customer</option>
+                    <option value="delivery_personnel">Delivery Personnel</option>
+                </select>
+
+                <label for="new-username"><b>New Username</b></label>
+                <input type="text" placeholder="Enter New Username" name="new-username" required>
+
+                <label for="new-password"><b>New Password</b></label>
+                <input type="password" placeholder="Enter New Password" name="new-password" required>
+
+                <div id="delivery-personnel-fields" style="display: none;">
+                    <label for="full-name"><b>Full Name</b></label>
+                    <input type="text" placeholder="Enter Full Name" name="full-name">
+
+                    <label for="email"><b>Email ID</b></label>
+                    <input type="text" placeholder="Enter Email ID" name="email">
+
+                    <label for="contact-number"><b>Contact Number</b></label>
+                    <input type="text" placeholder="Enter Contact Number" name="contact-number">
+
+                    <label for="address"><b>Address</b></label>
+                    <input type="text" placeholder="Enter Address" name="address">
+                </div>
+
+                <button type="submit">Sign Up</button>
+            </form>
+            <p>Already have an account? <a href="#" onclick="toggleForm('login-form')">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleForm(formId) {
+            var loginForm = document.getElementById('login-form');
+            var signupForm = document.getElementById('signup-form');
+
+            if (formId === 'login-form') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var userTypeDropdown = document.getElementById('user-type-signup');
+            var deliveryPersonnelFields = document.getElementById('delivery-personnel-fields');
+            var customerFields = document.getElementById('customer-fields');
+
+            userTypeDropdown.addEventListener('change', function () {
+                deliveryPersonnelFields.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

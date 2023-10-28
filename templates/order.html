@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Personnel Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/order.css') }}">
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Delivery Personnel Dashboard</h1>
+        <a href="/" id = "logout">Logout</a><br>
+
+
+        <table>
+            <thead>
+                <tr>
+                    <th id = "param1">Product ID</th>
+                    <th>Pickup Address</th>
+                    <th>Delivery Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+        <button id="submitBtn">Submit</button><br><br><br>
+        <div id="selectedOrder"></div>
+    </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector("table tbody");
+    const submitBtn = document.getElementById("submitBtn");
+    const selectedOrder = document.getElementById("selectedOrder");
+
+    let selectedOrderId = null;
+
+    
+    function selectRow(row) {
+        if (selectedOrderId) {
+            const prevSelectedRow = document.querySelector(`[data-order-id="${selectedOrderId}"]`);
+            prevSelectedRow.classList.remove("selected");
+        }
+
+        selectedOrderId = row.getAttribute("data-order-id");
+        row.classList.add("selected");
+    }
+
+    
+    async function fetchData() {
+        try {
+            const response = await fetch("/order_details"); 
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+
+           
+            tableBody.innerHTML = "";
+
+            data.forEach((order) => {
+                const row = document.createElement("tr");
+                row.setAttribute("data-order-id", order.id);
+
+                const columns = ["id", "pickup_address", "drop_address"];
+                columns.forEach((column) => {
+                    const cell = document.createElement("td");
+                    cell.textContent = order[column];
+                    row.appendChild(cell);
+                });
+
+                row.addEventListener("click", () => {
+                    selectRow(row);
+                });
+
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    fetchData();
+
+    const button = document.getElementById('submitBtn');
+
+    
+    submitBtn.addEventListener("click", function () {
+        if (selectedOrderId) {
+            selectedOrder.textContent = `${selectedOrderId} order is confirmed!`;
+
+            const param1Value = selectedOrderId;
+                console.log(selectedOrderId)
+
+            const apiUrl = '/change_status_confirm';
+                const queryParams = {
+                    product_id: param1Value
+            };
+
+     
+            const queryString = Object.keys(queryParams)
+                .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(queryParams[key]))
+                .join('&');
+
+        
+            const completeUrl = apiUrl + '?' + queryString;
+
+            fetch(completeUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+               
+                console.log(data);
+            })
+            .catch(error => {
+          
+                console.error('There was a problem with the fetch operation:', error);
+            });
+     }
+        else {
+            selectedOrder.textContent = "No order selected.";
+        }
+    });
+});
+
+    </script>
+</body>
+</html>
